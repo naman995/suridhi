@@ -8,7 +8,7 @@ const Navbar = () => {
 
   return (
     <nav className="bg-white shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-24">
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0 flex items-center">
@@ -24,36 +24,39 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link href="/" className="text-gray-600 hover:text-gray-900">
-              Home
+          <div className="hidden md:flex items-center space-x-4">
+            <Link href="/category/visiting-cards" className="text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-center px-3 py-1 rounded-full transition-colors duration-200">
+              Visiting Cards
             </Link>
-            <Link href="/category/t-shirts" className="text-gray-600 hover:text-gray-900">
-              T-Shirts
+            <Link href="/category/custom-polo-tshirts" className="text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-center px-3 py-1 rounded-full transition-colors duration-200">
+              Custom Polo T-shirts
             </Link>
-            <Link href="/category/pens" className="text-gray-600 hover:text-gray-900">
-              Pens
+            <Link href="/category/umbrellas-rainwear" className="text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-center px-3 py-1 rounded-full transition-colors duration-200">
+              Umbrellas & Rainwear
             </Link>
-            <Link href="/category/mugs" className="text-gray-600 hover:text-gray-900">
-              Mugs
+            <Link href="/category/custom-t-shirts" className="text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-center px-3 py-1 rounded-full transition-colors duration-200">
+              Custom T-shirts
             </Link>
-            <Link href="/category/bags" className="text-gray-600 hover:text-gray-900">
-              Bags
+            <Link href="/category/custom-stamps-ink" className="text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-center px-3 py-1 rounded-full transition-colors duration-200">
+              Custom Stamps & Ink
             </Link>
-            <Link href="/category/bottles" className="text-gray-600 hover:text-gray-900">
-              Bottles
+            <Link href="/category/photo-gifts" className="text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-center px-3 py-1 rounded-full transition-colors duration-200">
+              Photo Gifts
             </Link>
-            <Link href="/category/mouse-pads" className="text-gray-600 hover:text-gray-900">
-              Mouse Pads
+            {/* <Link href="/category/labels-stickers-packaging" className="text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-center px-3 py-1 rounded-full transition-colors duration-200">
+              Labels, Stickers & Packaging
+            </Link> */}
+            <Link href="/category/custom-stationery" className="text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-center px-3 py-1 rounded-full transition-colors duration-200">
+              Custom Stationery
             </Link>
-            <Link href="/category/caps" className="text-gray-600 hover:text-gray-900">
-              Caps
+            {/* <Link href="/category/signs-posters-marketing-materials" className="text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-center px-3 py-1 rounded-full transition-colors duration-200">
+              Signs, Posters & Marketing Materials
+            </Link> */}
+            <Link href="/category/custom-drinkware" className="text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-center px-3 py-1 rounded-full transition-colors duration-200">
+              Custom Drinkware
             </Link>
-            <Link href="/category/diwali-gifts" className="text-gray-600 hover:text-gray-900">
-              Diwali Gifts
-            </Link>
-            <Link href="/cart" className="text-gray-600 hover:text-gray-900">
-              Cart
+            <Link href="/category/custom-bags" className="text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-center px-3 py-1 rounded-full transition-colors duration-200">
+              Custom Bags
             </Link>
           </div>
 
@@ -82,35 +85,38 @@ const Navbar = () => {
       {isMenuOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link href="/" className="block px-3 py-2 text-gray-600 hover:text-gray-900">
-              Home
+            <Link href="/category/visiting-cards" className="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-center rounded-full transition-colors duration-200">
+              Visiting Cards
             </Link>
-            <Link href="/category/t-shirts" className="block px-3 py-2 text-gray-600 hover:text-gray-900">
-              T-Shirts
+            <Link href="/category/custom-polo-tshirts" className="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-center rounded-full transition-colors duration-200">
+              Custom Polo T-shirts
             </Link>
-            <Link href="/category/pens" className="block px-3 py-2 text-gray-600 hover:text-gray-900">
-              Pens
+            <Link href="/category/umbrellas-rainwear" className="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-center rounded-full transition-colors duration-200">
+              Umbrellas & Rainwear
             </Link>
-            <Link href="/category/mugs" className="block px-3 py-2 text-gray-600 hover:text-gray-900">
-              Mugs
+            <Link href="/category/custom-t-shirts" className="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-center rounded-full transition-colors duration-200">
+              Custom T-shirts
             </Link>
-            <Link href="/category/bags" className="block px-3 py-2 text-gray-600 hover:text-gray-900">
-              Bags
+            <Link href="/category/custom-stamps-ink" className="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-center rounded-full transition-colors duration-200">
+              Custom Stamps & Ink
             </Link>
-            <Link href="/category/bottles" className="block px-3 py-2 text-gray-600 hover:text-gray-900">
-              Bottles
+            <Link href="/category/photo-gifts" className="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-center rounded-full transition-colors duration-200">
+              Photo Gifts
             </Link>
-            <Link href="/category/mouse-pads" className="block px-3 py-2 text-gray-600 hover:text-gray-900">
-              Mouse Pads
+            {/* <Link href="/category/labels-stickers-packaging" className="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-center rounded-full transition-colors duration-200">
+              Labels, Stickers & Packaging
+            </Link> */}
+            <Link href="/category/custom-stationery" className="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-center rounded-full transition-colors duration-200">
+              Custom Stationery
             </Link>
-            <Link href="/category/caps" className="block px-3 py-2 text-gray-600 hover:text-gray-900">
-              Caps
+            {/* <Link href="/category/signs-posters-marketing-materials" className="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-center rounded-full transition-colors duration-200">
+              Signs, Posters & Marketing Materials
+            </Link> */}
+            <Link href="/category/custom-drinkware" className="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-center rounded-full transition-colors duration-200">
+              Custom Drinkware
             </Link>
-            <Link href="/category/diwali-gifts" className="block px-3 py-2 text-gray-600 hover:text-gray-900">
-              Diwali Gifts
-            </Link>
-            <Link href="/cart" className="block px-3 py-2 text-gray-600 hover:text-gray-900">
-              Cart
+            <Link href="/category/custom-bags" className="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-center rounded-full transition-colors duration-200">
+              Custom Bags
             </Link>
           </div>
         </div>

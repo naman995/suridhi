@@ -3,10 +3,11 @@ export interface Product {
   name: string;
   price: number;
   image: string;
+  images?: string[];
   category: string;
   description: string;
   sizes?: string[];
-  colors?: string[];
+  colors?: { name: string; hex: string }[];
   rating: number;
   reviews: number;
   inStock: boolean;
@@ -32,10 +33,19 @@ export const products: Product[] = [
     name: 'Classic White T-Shirt',
     price: 29.99,
     image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=880&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=880&q=80',
+      'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?ixlib=rb-4.0.3&auto=format&fit=crop&w=880&q=80',
+      'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-4.0.3&auto=format&fit=crop&w=880&q=80'
+    ],
     category: 'Clothing',
     description: 'A comfortable and stylish white t-shirt made from 100% organic cotton. Perfect for everyday wear with a modern fit and excellent durability.',
     sizes: ['S', 'M', 'L', 'XL'],
-    colors: ['White', 'Black', 'Navy'],
+    colors: [
+      { name: 'White', hex: '#FFFFFF' },
+      { name: 'Black', hex: '#222222' },
+      { name: 'Navy', hex: '#1A237E' }
+    ],
     rating: 4.5,
     reviews: 128,
     inStock: true,
