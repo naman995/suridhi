@@ -694,9 +694,9 @@ export default function ProductDetailPage() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                          {product.sizeChart.sizes.map((size, index) => (
+                          {product.sizeChart?.sizes.map((size, index) => (
                             <tr key={index} className="hover:bg-gray-50">
-                              {product.sizeChart.columns?.map((column) => (
+                              {product.sizeChart?.columns?.map((column) => (
                                 <td
                                   key={column}
                                   className="px-6 py-4 text-sm text-gray-700"
@@ -721,7 +721,7 @@ export default function ProductDetailPage() {
                         </tbody>
                       </table>
                     </div>
-                    {product.sizeChart.instructions && (
+                    {product.sizeChart?.instructions && (
                       <div className="mt-6 p-4 bg-blue-50 rounded-lg">
                         <p className="text-sm text-blue-800">
                           {product.sizeChart.instructions}

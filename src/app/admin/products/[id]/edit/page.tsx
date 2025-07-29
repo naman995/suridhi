@@ -13,7 +13,7 @@ import {
   getSubcategories,
   uploadImage,
 } from "@/lib/firebase-services";
-import { Category } from "@/types";
+import { Category, Product } from "@/types";
 
 export default function EditProductPage() {
   const router = useRouter();
@@ -130,14 +130,14 @@ export default function EditProductPage() {
           designGuidelines: product.overview?.designGuidelines || [],
           qualityFeatures: product.overview?.qualityFeatures || [],
         },
-        specs: product.specs || {
-          templates: [],
-          specifications: [],
+        specs: {
+          templates: product.specs?.templates || [],
+          specifications: product.specs?.specifications || [],
         },
-        sizeChart: product.sizeChart || {
-          sizes: [],
-          instructions: "",
-          columns: ["Size", "Chest", "Length"],
+        sizeChart: {
+          sizes: product.sizeChart?.sizes || [],
+          instructions: product.sizeChart?.instructions || "",
+          columns: product.sizeChart?.columns || ["Size", "Chest", "Length"],
         },
         faq: product.faq || [],
         quantityTiers: product.quantityTiers || [],

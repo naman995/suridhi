@@ -76,7 +76,10 @@ export const products: Product[] = [
     categoryName: "Electronics",
     description:
       "Premium wireless headphones with active noise cancellation, 30-hour battery life, and crystal-clear sound quality. Perfect for music lovers and professionals.",
-    colors: ["Black", "Silver"],
+    colors: [
+      { name: "Black", hex: "#000000" },
+      { name: "Silver", hex: "#C0C0C0" },
+    ],
     rating: 4.8,
     reviews: 256,
     inStock: true,
@@ -95,7 +98,11 @@ export const products: Product[] = [
     description:
       "High-performance running shoes with advanced cushioning technology, breathable mesh upper, and durable rubber outsole. Ideal for both casual runners and athletes.",
     sizes: ["7", "8", "9", "10", "11"],
-    colors: ["Red", "Blue", "Black"],
+    colors: [
+      { name: "Red", hex: "#FF0000" },
+      { name: "Blue", hex: "#0000FF" },
+      { name: "Black", hex: "#000000" },
+    ],
     rating: 4.6,
     reviews: 189,
     inStock: true,
@@ -114,7 +121,11 @@ export const products: Product[] = [
     categoryName: "Electronics",
     description:
       "Advanced smartwatch with health monitoring, GPS tracking, and seamless smartphone integration. Features a bright always-on display and water resistance.",
-    colors: ["Black", "Silver", "Gold"],
+    colors: [
+      { name: "Black", hex: "#000000" },
+      { name: "Silver", hex: "#C0C0C0" },
+      { name: "Gold", hex: "#FFD700" },
+    ],
     rating: 4.7,
     reviews: 312,
     inStock: true,
@@ -131,7 +142,10 @@ export const products: Product[] = [
     categoryName: "Accessories",
     description:
       "Handcrafted genuine leather wallet with multiple card slots and RFID protection. Features a sleek design and premium stitching.",
-    colors: ["Brown", "Black"],
+    colors: [
+      { name: "Brown", hex: "#8B4513" },
+      { name: "Black", hex: "#000000" },
+    ],
     rating: 4.4,
     reviews: 95,
     inStock: true,
@@ -165,7 +179,11 @@ export const products: Product[] = [
     categoryName: "Sports & Outdoors",
     description:
       "Eco-friendly yoga mat with perfect thickness for comfort and stability. Includes carrying strap and alignment lines.",
-    colors: ["Purple", "Blue", "Green"],
+    colors: [
+      { name: "Purple", hex: "#800080" },
+      { name: "Blue", hex: "#0000FF" },
+      { name: "Green", hex: "#008000" },
+    ],
     rating: 4.5,
     reviews: 167,
     inStock: true,

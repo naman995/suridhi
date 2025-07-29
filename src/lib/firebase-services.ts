@@ -267,9 +267,12 @@ export const getParentCategories = async (): Promise<Category[]> => {
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data(),
+      name: doc.data().name || "",
+      count: doc.data().count || 0,
+      description: doc.data().description || "",
+      image: doc.data().image || "",
       showInNavbar: doc.data().showInNavbar || false,
-      parentId: null,
+      parentId: undefined,
       createdAt: doc.data().createdAt?.toDate() || new Date(),
       updatedAt: doc.data().updatedAt?.toDate() || new Date(),
     })) as Category[];
@@ -325,17 +328,26 @@ export const getProducts = async (
   subcategoryId?: string
 ): Promise<Product[]> => {
   try {
-    let q = collection(db, "products");
+    let q;
 
     if (subcategoryId) {
       // If subcategoryId is provided, get products from that subcategory
-      q = query(q, where("subcategoryId", "==", subcategoryId));
+      q = query(
+        collection(db, "products"),
+        where("subcategoryId", "==", subcategoryId),
+        orderBy("createdAt", "desc")
+      );
     } else if (categoryId) {
       // If only categoryId is provided, get products from that category (including subcategories)
-      q = query(q, where("categoryId", "==", categoryId));
+      q = query(
+        collection(db, "products"),
+        where("categoryId", "==", categoryId),
+        orderBy("createdAt", "desc")
+      );
+    } else {
+      // Get all products
+      q = query(collection(db, "products"), orderBy("createdAt", "desc"));
     }
-
-    q = query(q, orderBy("createdAt", "desc"));
 
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map((doc) => ({

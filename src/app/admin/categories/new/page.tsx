@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import AdminLayout from "@/components/admin/AdminLayout";
 import {
@@ -12,7 +12,7 @@ import { Upload, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Category } from "@/types";
 
-export default function NewCategoryPage() {
+function NewCategoryForm() {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -301,5 +301,13 @@ export default function NewCategoryPage() {
         </div>
       </div>
     </AdminLayout>
+  );
+}
+
+export default function NewCategoryPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <NewCategoryForm />
+    </Suspense>
   );
 }
