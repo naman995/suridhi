@@ -125,10 +125,10 @@ export default function EditProductPage() {
         isTrending: product.isTrending || false,
         images: product.images || [],
         categoryName: product.categoryName,
-        overview: product.overview || {
-          materialOptions: [],
-          designGuidelines: [],
-          qualityFeatures: [],
+        overview: {
+          materialOptions: product.overview?.materialOptions || [],
+          designGuidelines: product.overview?.designGuidelines || [],
+          qualityFeatures: product.overview?.qualityFeatures || [],
         },
         specs: product.specs || {
           templates: [],
