@@ -72,14 +72,22 @@ function NewCategoryForm() {
         imageUrl = await uploadImage(formData.image, path);
       }
 
-      await addCategory({
+      // Prepare category data, filtering out empty parentId
+      const categoryData: Omit<Category, "id" | "createdAt" | "updatedAt"> = {
         name: formData.name,
         description: formData.description,
         image: imageUrl,
         showInNavbar: formData.showInNavbar,
-        parentId: formData.parentId || undefined,
         count: formData.count,
-      });
+        parentId: undefined,
+      };
+
+      // Only add parentId if it's not empty
+      if (formData.parentId && formData.parentId.trim() !== "") {
+        categoryData.parentId = formData.parentId;
+      }
+
+      await addCategory(categoryData);
 
       router.push("/admin/categories");
     } catch (error: unknown) {
