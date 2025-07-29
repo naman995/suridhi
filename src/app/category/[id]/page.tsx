@@ -4,10 +4,14 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import DynamicNavbar from "@/components/DynamicNavbar";
+
 import ProductCard from "@/components/ProductCard";
-import { getCategory, getProducts } from "@/lib/firebase-services";
+import {
+  getCategory,
+  getProducts,
+  getSubcategories,
+} from "@/lib/firebase-services";
 import { Category, Product } from "@/types";
 
 export default function CategoryPage() {
@@ -16,6 +20,7 @@ export default function CategoryPage() {
 
   const [category, setCategory] = useState<Category | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
+  const [subcategories, setSubcategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -25,10 +30,13 @@ export default function CategoryPage() {
 
   const fetchCategoryAndProducts = async () => {
     try {
-      const [categoryData, productsData] = await Promise.all([
-        getCategory(categoryId),
-        getProducts(categoryId),
-      ]);
+      const [categoryData, productsData, subcategoriesData] = await Promise.all(
+        [
+          getCategory(categoryId),
+          getProducts(categoryId),
+          getSubcategories(categoryId),
+        ]
+      );
 
       if (!categoryData) {
         setError("Category not found");
@@ -37,6 +45,7 @@ export default function CategoryPage() {
 
       setCategory(categoryData);
       setProducts(productsData);
+      setSubcategories(subcategoriesData);
     } catch (error) {
       console.error("Error fetching category data:", error);
       setError("Failed to load category");
@@ -47,20 +56,19 @@ export default function CategoryPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-50">
-        <Navbar />
+      <div className="min-h-screen bg-gray-50">
+        <DynamicNavbar />
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
         </div>
-        <Footer />
-      </main>
+      </div>
     );
   }
 
   if (error || !category) {
     return (
-      <main className="min-h-screen bg-gray-50">
-        <Navbar />
+      <div className="min-h-screen bg-gray-50">
+        <DynamicNavbar />
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
@@ -77,14 +85,13 @@ export default function CategoryPage() {
             </Link>
           </div>
         </div>
-        <Footer />
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <Navbar />
+    <div className="min-h-screen bg-gray-50">
+      <DynamicNavbar />
 
       {/* Breadcrumbs */}
       <div className="bg-white border-b">
@@ -154,10 +161,54 @@ export default function CategoryPage() {
               </div>
             </div>
 
+            {/* Subcategories Section */}
+            {subcategories.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                  Subcategories
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {subcategories.map((subcategory) => (
+                    <Link
+                      key={subcategory.id}
+                      href={`/subcategory/${categoryId}/${subcategory.id}`}
+                      className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex items-center space-x-4">
+                        {subcategory.image && (
+                          <div className="relative w-16 h-16 flex-shrink-0">
+                            <Image
+                              src={subcategory.image}
+                              alt={subcategory.name}
+                              fill
+                              className="object-cover rounded-lg"
+                            />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-lg font-semibold text-gray-900 truncate">
+                            {subcategory.name}
+                          </h3>
+                          {subcategory.description && (
+                            <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                              {subcategory.description}
+                            </p>
+                          )}
+                          <p className="text-xs text-blue-600 mt-2">
+                            View products →
+                          </p>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Products Section */}
             <div>
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                Products
+                {subcategories.length > 0 ? "All Products" : "Products"}
               </h2>
               {products.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -237,8 +288,6 @@ export default function CategoryPage() {
           </div>
         </div>
       </div>
-
-      <Footer />
-    </main>
+    </div>
   );
 }

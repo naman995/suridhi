@@ -2,10 +2,8 @@
 
 import { useState, useEffect } from "react";
 import HeroSection from "@/components/HeroSection";
-import Navbar from "@/components/Navbar";
-import ProductCard from "@/components/ProductCard";
-import Sidebar from "@/components/Sidebar";
-import { fetchProducts, fetchCategories } from "@/data/products";
+import DynamicNavbar from "@/components/DynamicNavbar";
+import { fetchCategories } from "@/data/products";
 import {
   getPopularProducts,
   getTrendingProducts,
@@ -14,7 +12,6 @@ import CategoryBrowser from "@/components/CategoryBrowser";
 import { Product, Category } from "@/types";
 
 export default function Home() {
-  const [products, setProducts] = useState<Product[]>([]);
   const [popularProducts, setPopularProducts] = useState<Product[]>([]);
   const [trendingProducts, setTrendingProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -23,15 +20,15 @@ export default function Home() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [productsData, categoriesData] = await Promise.all([
-          fetchProducts(),
+        const [categoriesData, popularData, trendingData] = await Promise.all([
           fetchCategories(),
+          getPopularProducts(),
+          getTrendingProducts(),
         ]);
 
-        setProducts(productsData);
         setCategories(categoriesData);
-        setPopularProducts([]);
-        setTrendingProducts([]);
+        setPopularProducts(popularData);
+        setTrendingProducts(trendingData);
       } catch (error) {
         console.error("Error loading data:", error);
       } finally {
@@ -45,7 +42,7 @@ export default function Home() {
   if (loading) {
     return (
       <main className="min-h-screen bg-gray-50">
-        <Navbar />
+        <DynamicNavbar />
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
         </div>
@@ -55,7 +52,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <Navbar />
+      <DynamicNavbar />
       <div className="w-full">
         <HeroSection />
         <div className="mx-10 py-10">

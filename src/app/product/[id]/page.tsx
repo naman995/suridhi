@@ -16,15 +16,17 @@ import {
   Shield,
   RefreshCw,
 } from "lucide-react";
-import Navbar from "@/components/Navbar";
+import DynamicNavbar from "@/components/DynamicNavbar";
 import { getProduct } from "@/lib/firebase-services";
 import { Product } from "@/types";
+import { useCart } from "@/contexts/CartContext";
 
 type TabType = "overview" | "specs" | "sizeChart" | "faq";
 
 export default function ProductDetailPage() {
   const params = useParams();
   const productId = params.id as string;
+  const { addItem } = useCart();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -83,7 +85,7 @@ export default function ProductDetailPage() {
   if (loading) {
     return (
       <main className="min-h-screen bg-gray-50">
-        <Navbar />
+        <DynamicNavbar />
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
         </div>
@@ -94,7 +96,7 @@ export default function ProductDetailPage() {
   if (error || !product) {
     return (
       <main className="min-h-screen bg-gray-50">
-        <Navbar />
+        <DynamicNavbar />
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
@@ -117,7 +119,7 @@ export default function ProductDetailPage() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <Navbar />
+      <DynamicNavbar />
 
       {/* Breadcrumbs */}
       <div className="bg-white border-b border-gray-100">
@@ -341,49 +343,115 @@ export default function ProductDetailPage() {
 
                     {showQuantityDropdown && (
                       <div className="absolute top-full left-0 right-0 mt-1 bg-white border-2 border-gray-200 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((quantity) => {
-                          const priceForQuantity =
-                            getPriceForQuantity(quantity);
-                          return (
-                            <button
-                              key={quantity}
-                              onClick={() => {
-                                setSelectedQuantity(quantity);
-                                setShowQuantityDropdown(false);
-                              }}
-                              className={`w-full px-4 py-3 text-left flex items-center justify-between hover:bg-gray-50 transition-colors ${
-                                selectedQuantity === quantity
-                                  ? "bg-blue-50 border-l-4 border-blue-600"
-                                  : "border-l-4 border-transparent"
-                              }`}
-                            >
-                              <span className="text-gray-900">
-                                {quantity} (₹{priceForQuantity.toFixed(2)} /
-                                unit)
-                              </span>
-                              {selectedQuantity === quantity && (
-                                <CheckCircle className="h-5 w-5 text-blue-600" />
-                              )}
-                            </button>
-                          );
-                        })}
+                        {(() => {
+                          // Generate quantity options based on tiers or default to 1-10
+                          let quantityOptions: number[] = [];
+
+                          if (
+                            product.quantityTiers &&
+                            product.quantityTiers.length > 0
+                          ) {
+                            // Use the tiers to generate quantity options
+                            product.quantityTiers.forEach((tier) => {
+                              for (
+                                let qty = tier.minQuantity;
+                                qty <= tier.maxQuantity;
+                                qty++
+                              ) {
+                                if (!quantityOptions.includes(qty)) {
+                                  quantityOptions.push(qty);
+                                }
+                              }
+                            });
+                            // Add base quantity if not in tiers
+                            if (!quantityOptions.includes(1)) {
+                              quantityOptions.unshift(1);
+                            }
+                            // Sort and limit to reasonable range
+                            quantityOptions = quantityOptions
+                              .sort((a, b) => a - b)
+                              .slice(0, 20); // Limit to 20 options
+                          } else {
+                            // Default to 1-10 if no tiers
+                            quantityOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+                          }
+
+                          return quantityOptions.map((quantity) => {
+                            const priceForQuantity =
+                              getPriceForQuantity(quantity);
+                            return (
+                              <button
+                                key={quantity}
+                                onClick={() => {
+                                  setSelectedQuantity(quantity);
+                                  setShowQuantityDropdown(false);
+                                }}
+                                className={`w-full px-4 py-3 text-left flex items-center justify-between hover:bg-gray-50 transition-colors ${
+                                  selectedQuantity === quantity
+                                    ? "bg-blue-50 border-l-4 border-blue-600"
+                                    : "border-l-4 border-transparent"
+                                }`}
+                              >
+                                <span className="text-gray-900">
+                                  {quantity} (₹{priceForQuantity.toFixed(2)} /
+                                  unit)
+                                </span>
+                                {selectedQuantity === quantity && (
+                                  <CheckCircle className="h-5 w-5 text-blue-600" />
+                                )}
+                              </button>
+                            );
+                          });
+                        })()}
                       </div>
                     )}
                   </div>
                   {product.quantityTiers &&
                     product.quantityTiers.length > 0 && (
-                      <p className="text-xs text-gray-500 mt-2">
-                        Bulk pricing available for larger quantities
-                      </p>
+                      <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+                        <p className="text-sm font-medium text-blue-900 mb-2">
+                          Bulk Pricing Available
+                        </p>
+                        <div className="space-y-1">
+                          {product.quantityTiers.map((tier, index) => (
+                            <div
+                              key={index}
+                              className="flex justify-between text-xs text-blue-800"
+                            >
+                              <span>
+                                {tier.minQuantity === tier.maxQuantity
+                                  ? `${tier.minQuantity} unit`
+                                  : `${tier.minQuantity}-${tier.maxQuantity} units`}
+                              </span>
+                              <span className="font-medium">
+                                ₹{tier.pricePerUnit.toFixed(2)} per unit
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     )}
                 </div>
 
-                <div className="flex items-center gap-4 mb-6">
-                  <button className="flex-1 bg-blue-600 text-white py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-base">
+                <div className="mb-6">
+                  <button
+                    onClick={() => {
+                      addItem(
+                        product,
+                        selectedQuantity,
+                        selectedSize,
+                        selectedColor
+                      );
+                      // Show success message
+                      alert(
+                        `Added ${selectedQuantity} ${
+                          selectedQuantity === 1 ? "item" : "items"
+                        } to cart!`
+                      );
+                    }}
+                    className="w-full bg-blue-600 text-white py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-base"
+                  >
                     Add to Cart
-                  </button>
-                  <button className="p-4 border-2 border-gray-200 rounded-lg hover:border-gray-300 hover:bg-gray-50 transition-colors">
-                    <Heart className="h-6 w-6 text-gray-600" />
                   </button>
                 </div>
 
@@ -604,29 +672,51 @@ export default function ProductDetailPage() {
                       <table className="min-w-full">
                         <thead>
                           <tr className="bg-gray-50">
-                            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                              Size
-                            </th>
-                            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                              Chest (inches)
-                            </th>
-                            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                              Length (inches)
-                            </th>
+                            {product.sizeChart.columns?.map((column) => (
+                              <th
+                                key={column}
+                                className="px-6 py-4 text-left text-sm font-semibold text-gray-900"
+                              >
+                                {column}
+                              </th>
+                            )) || (
+                              <>
+                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                                  Size
+                                </th>
+                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                                  Chest (inches)
+                                </th>
+                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                                  Length (inches)
+                                </th>
+                              </>
+                            )}
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
                           {product.sizeChart.sizes.map((size, index) => (
                             <tr key={index} className="hover:bg-gray-50">
-                              <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                                {size.size}
-                              </td>
-                              <td className="px-6 py-4 text-sm text-gray-700">
-                                {size.chest}
-                              </td>
-                              <td className="px-6 py-4 text-sm text-gray-700">
-                                {size.length}
-                              </td>
+                              {product.sizeChart.columns?.map((column) => (
+                                <td
+                                  key={column}
+                                  className="px-6 py-4 text-sm text-gray-700"
+                                >
+                                  {size[column] || ""}
+                                </td>
+                              )) || (
+                                <>
+                                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                                    {size.size || ""}
+                                  </td>
+                                  <td className="px-6 py-4 text-sm text-gray-700">
+                                    {size.chest || ""}
+                                  </td>
+                                  <td className="px-6 py-4 text-sm text-gray-700">
+                                    {size.length || ""}
+                                  </td>
+                                </>
+                              )}
                             </tr>
                           ))}
                         </tbody>

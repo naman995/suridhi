@@ -21,6 +21,7 @@ export default function EditCategoryPage() {
     name: "",
     description: "",
     image: null as File | null,
+    showInNavbar: false,
   });
   const [existingImage, setExistingImage] = useState<string>("");
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -44,6 +45,7 @@ export default function EditCategoryPage() {
         name: categoryData.name,
         description: categoryData.description,
         image: null,
+        showInNavbar: categoryData.showInNavbar || false,
       });
       setExistingImage(categoryData.image || "");
     } catch (error) {
@@ -84,6 +86,7 @@ export default function EditCategoryPage() {
         name: formData.name,
         description: formData.description,
         image: imageUrl,
+        showInNavbar: formData.showInNavbar,
       });
 
       router.push("/admin/categories");
@@ -198,6 +201,27 @@ export default function EditCategoryPage() {
                 page.
               </p>
             </div>
+
+            <div className="flex items-center">
+              <input
+                id="showInNavbar"
+                type="checkbox"
+                checked={formData.showInNavbar}
+                onChange={(e) =>
+                  setFormData({ ...formData, showInNavbar: e.target.checked })
+                }
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label
+                htmlFor="showInNavbar"
+                className="ml-2 block text-sm text-gray-900"
+              >
+                Show in Navigation Bar
+              </label>
+            </div>
+            <p className="text-sm text-gray-500">
+              Check this box to display this category in the main navigation bar.
+            </p>
 
             <div>
               <label className="block text-sm font-medium text-gray-700">

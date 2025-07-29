@@ -4,6 +4,9 @@ export interface Category {
   description?: string;
   image?: string;
   count: number;
+  showInNavbar?: boolean;
+  parentId?: string;
+  subcategories?: Category[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -15,7 +18,9 @@ export interface Product {
   image: string;
   images?: string[];
   categoryId: string;
+  subcategoryId?: string;
   categoryName: string;
+  subcategoryName?: string;
   description: string;
   sizes?: string[];
   colors?: { name: string; hex: string }[];
@@ -45,8 +50,9 @@ export interface Product {
     specifications?: string[];
   };
   sizeChart?: {
-    sizes: { size: string; chest: string; length: string }[];
+    sizes: { [key: string]: string }[];
     instructions?: string;
+    columns?: string[];
   };
   faq?: { question: string; answer: string }[];
   createdAt: Date;

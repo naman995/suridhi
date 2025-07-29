@@ -1,24 +1,52 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { addCategory, uploadImage } from "@/lib/firebase-services";
+import {
+  addCategory,
+  uploadImage,
+  getParentCategories,
+} from "@/lib/firebase-services";
 import { Upload, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { Category } from "@/types";
 
 export default function NewCategoryPage() {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     image: null as File | null,
+    showInNavbar: false,
+    parentId: "",
     // Additional fields from mock data
     count: 0,
   });
   const [imagePreview, setImagePreview] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [parentCategories, setParentCategories] = useState<Category[]>([]);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const fetchParentCategories = async () => {
+      try {
+        const categories = await getParentCategories();
+        setParentCategories(categories);
+      } catch (error) {
+        console.error("Error fetching parent categories:", error);
+      }
+    };
+
+    fetchParentCategories();
+
+    // Set parentId from URL if provided
+    const parentId = searchParams.get("parentId");
+    if (parentId) {
+      setFormData((prev) => ({ ...prev, parentId }));
+    }
+  }, [searchParams]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -48,6 +76,8 @@ export default function NewCategoryPage() {
         name: formData.name,
         description: formData.description,
         image: imageUrl,
+        showInNavbar: formData.showInNavbar,
+        parentId: formData.parentId || null,
         count: formData.count,
       });
 
@@ -126,6 +156,33 @@ export default function NewCategoryPage() {
 
             <div>
               <label
+                htmlFor="parentId"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Parent Category
+              </label>
+              <select
+                id="parentId"
+                value={formData.parentId}
+                onChange={(e) =>
+                  setFormData({ ...formData, parentId: e.target.value })
+                }
+                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+              >
+                <option value="">Select a parent category (optional)</option>
+                {parentCategories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+              <p className="text-sm text-gray-500 mt-1">
+                Leave empty to create a main category, or select a parent to create a subcategory.
+              </p>
+            </div>
+
+            <div>
+              <label
                 htmlFor="count"
                 className="block text-sm font-medium text-gray-700"
               >
@@ -146,6 +203,28 @@ export default function NewCategoryPage() {
                 placeholder="Number of products in this category"
               />
             </div>
+
+            <div className="flex items-center">
+              <input
+                id="showInNavbar"
+                type="checkbox"
+                checked={formData.showInNavbar}
+                onChange={(e) =>
+                  setFormData({ ...formData, showInNavbar: e.target.checked })
+                }
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label
+                htmlFor="showInNavbar"
+                className="ml-2 block text-sm text-gray-900"
+              >
+                Show in Navigation Bar
+              </label>
+            </div>
+            <p className="text-sm text-gray-500">
+              Check this box to display this category in the main navigation
+              bar.
+            </p>
 
             <div>
               <label className="block text-sm font-medium text-gray-700">

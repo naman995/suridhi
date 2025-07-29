@@ -5,10 +5,12 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Upload, X, Plus } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
+import SizeChartEditor from "@/components/SizeChartEditor";
 import {
   getProduct,
   updateProduct,
   getCategories,
+  getSubcategories,
   uploadImage,
 } from "@/lib/firebase-services";
 import { Product, Category } from "@/types";
@@ -23,6 +25,7 @@ export default function EditProductPage() {
     price: "",
     description: "",
     categoryId: "",
+    subcategoryId: "",
     sizes: [] as string[],
     colors: [] as { name: string; hex: string }[],
     inStock: true,
@@ -47,13 +50,21 @@ export default function EditProductPage() {
       specifications: [] as string[],
     },
     sizeChart: {
-      sizes: [] as { size: string; chest: string; length: string }[],
+      sizes: [] as { [key: string]: string }[],
       instructions: "",
+      columns: ["Size", "Chest", "Length"],
     },
     faq: [] as { question: string; answer: string }[],
+    // Quantity tiers
+    quantityTiers: [] as {
+      minQuantity: number;
+      maxQuantity: number;
+      pricePerUnit: number;
+    }[],
   });
 
   const [categories, setCategories] = useState<Category[]>([]);
+  const [subcategories, setSubcategories] = useState<Category[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [newImages, setNewImages] = useState<File[]>([]);
   const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
@@ -62,6 +73,11 @@ export default function EditProductPage() {
   const [error, setError] = useState("");
   const [newSize, setNewSize] = useState("");
   const [newColor, setNewColor] = useState({ name: "", hex: "#000000" });
+  const [newQuantityTier, setNewQuantityTier] = useState({
+    minQuantity: "",
+    maxQuantity: "",
+    pricePerUnit: "",
+  });
 
   useEffect(() => {
     fetchProductAndCategories();
@@ -80,11 +96,23 @@ export default function EditProductPage() {
       }
 
       setCategories(categoriesData);
+
+      // Fetch subcategories if the product has a category
+      if (product.categoryId) {
+        try {
+          const subcats = await getSubcategories(product.categoryId);
+          setSubcategories(subcats);
+        } catch (error) {
+          console.error("Error fetching subcategories:", error);
+          setSubcategories([]);
+        }
+      }
       setFormData({
         name: product.name,
         price: product.price.toString(),
         description: product.description,
         categoryId: product.categoryId,
+        subcategoryId: product.subcategoryId || "",
         sizes: product.sizes || [],
         colors: product.colors || [],
         inStock: product.inStock,
@@ -109,8 +137,10 @@ export default function EditProductPage() {
         sizeChart: product.sizeChart || {
           sizes: [],
           instructions: "",
+          columns: ["Size", "Chest", "Length"],
         },
         faq: product.faq || [],
+        quantityTiers: product.quantityTiers || [],
       });
       setExistingImages(product.images || []);
     } catch (error) {
@@ -118,6 +148,21 @@ export default function EditProductPage() {
       setError("Failed to load product");
     } finally {
       setInitialLoading(false);
+    }
+  };
+
+  const handleCategoryChange = async (categoryId: string) => {
+    setFormData((prev) => ({ ...prev, categoryId, subcategoryId: "" }));
+    if (categoryId) {
+      try {
+        const subcats = await getSubcategories(categoryId);
+        setSubcategories(subcats);
+      } catch (error) {
+        console.error("Error fetching subcategories:", error);
+        setSubcategories([]);
+      }
+    } else {
+      setSubcategories([]);
     }
   };
 
@@ -187,6 +232,38 @@ export default function EditProductPage() {
     }));
   };
 
+  const addQuantityTier = () => {
+    if (
+      newQuantityTier.minQuantity &&
+      newQuantityTier.maxQuantity &&
+      newQuantityTier.pricePerUnit
+    ) {
+      setFormData((prev) => ({
+        ...prev,
+        quantityTiers: [
+          ...(prev.quantityTiers || []),
+          {
+            minQuantity: parseInt(newQuantityTier.minQuantity),
+            maxQuantity: parseInt(newQuantityTier.maxQuantity),
+            pricePerUnit: parseFloat(newQuantityTier.pricePerUnit),
+          },
+        ],
+      }));
+      setNewQuantityTier({
+        minQuantity: "",
+        maxQuantity: "",
+        pricePerUnit: "",
+      });
+    }
+  };
+
+  const removeQuantityTier = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      quantityTiers: (prev.quantityTiers || []).filter((_, i) => i !== index),
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -207,6 +284,9 @@ export default function EditProductPage() {
       const selectedCategory = categories.find(
         (cat) => cat.id === formData.categoryId
       );
+      const selectedSubcategory = subcategories.find(
+        (subcat) => subcat.id === formData.subcategoryId
+      );
 
       // Prepare product data, filtering out undefined values
       const productData: any = {
@@ -215,7 +295,9 @@ export default function EditProductPage() {
         image: allImages[0] || "",
         images: allImages,
         categoryId: formData.categoryId,
+        subcategoryId: formData.subcategoryId || undefined,
         categoryName: selectedCategory?.name || "",
+        subcategoryName: selectedSubcategory?.name || undefined,
         description: formData.description,
         rating: parseFloat(formData.rating),
         reviews: parseInt(formData.reviews),
@@ -414,9 +496,7 @@ export default function EditProductPage() {
                 id="categoryId"
                 required
                 value={formData.categoryId}
-                onChange={(e) =>
-                  setFormData({ ...formData, categoryId: e.target.value })
-                }
+                onChange={(e) => handleCategoryChange(e.target.value)}
                 className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
               >
                 <option value="">Select a category</option>
@@ -427,6 +507,33 @@ export default function EditProductPage() {
                 ))}
               </select>
             </div>
+
+            {/* Subcategory Selection */}
+            {subcategories.length > 0 && (
+              <div>
+                <label
+                  htmlFor="subcategoryId"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Subcategory
+                </label>
+                <select
+                  id="subcategoryId"
+                  value={formData.subcategoryId}
+                  onChange={(e) =>
+                    setFormData({ ...formData, subcategoryId: e.target.value })
+                  }
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                >
+                  <option value="">Select a subcategory (optional)</option>
+                  {subcategories.map((subcategory) => (
+                    <option key={subcategory.id} value={subcategory.id}>
+                      {subcategory.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div>
               <label
@@ -622,6 +729,86 @@ export default function EditProductPage() {
                   <Plus className="h-4 w-4" />
                 </button>
               </div>
+            </div>
+
+            {/* Quantity Tiers */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Quantity Pricing Tiers (Bulk Discounts)
+              </label>
+              <div className="space-y-2 mb-4">
+                {formData.quantityTiers &&
+                  formData.quantityTiers.map((tier, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                    >
+                      <span className="text-sm text-gray-700">
+                        {tier.minQuantity} - {tier.maxQuantity} units: ₹
+                        {tier.pricePerUnit.toFixed(2)} per unit
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeQuantityTier(index)}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <input
+                  type="number"
+                  value={newQuantityTier.minQuantity}
+                  onChange={(e) =>
+                    setNewQuantityTier({
+                      ...newQuantityTier,
+                      minQuantity: e.target.value,
+                    })
+                  }
+                  placeholder="Min Qty"
+                  className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                />
+                <input
+                  type="number"
+                  value={newQuantityTier.maxQuantity}
+                  onChange={(e) =>
+                    setNewQuantityTier({
+                      ...newQuantityTier,
+                      maxQuantity: e.target.value,
+                    })
+                  }
+                  placeholder="Max Qty"
+                  className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                />
+                <div className="flex space-x-2">
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={newQuantityTier.pricePerUnit}
+                    onChange={(e) =>
+                      setNewQuantityTier({
+                        ...newQuantityTier,
+                        pricePerUnit: e.target.value,
+                      })
+                    }
+                    placeholder="Price/Unit"
+                    className="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                  />
+                  <button
+                    type="button"
+                    onClick={addQuantityTier}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+              <p className="text-sm text-gray-500 mt-2">
+                Add quantity tiers for bulk pricing. Leave empty to use base
+                price for all quantities.
+              </p>
             </div>
 
             {/* Product Options */}
@@ -983,71 +1170,15 @@ export default function EditProductPage() {
                   <h4 className="text-md font-medium text-gray-900 mb-4">
                     Size Chart Section
                   </h4>
-
-                  {/* Size Chart Instructions */}
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Size Chart Instructions
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.sizeChart.instructions}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          sizeChart: {
-                            ...formData.sizeChart,
-                            instructions: e.target.value,
-                          },
-                        })
-                      }
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
-                      placeholder="For best fit, measure your favorite t-shirt and compare with the chart above."
-                    />
-                  </div>
-
-                  {/* Size Chart Data */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Size Chart Data (CSV format: Size,Chest,Length)
-                    </label>
-                    <textarea
-                      rows={6}
-                      value={formData.sizeChart.sizes
-                        .map(
-                          (size) => `${size.size},${size.chest},${size.length}`
-                        )
-                        .join("\n")}
-                      onChange={(e) => {
-                        const lines = e.target.value
-                          .split("\n")
-                          .filter((line) => line.trim());
-                        const sizes = lines.map((line) => {
-                          const [size, chest, length] = line
-                            .split(",")
-                            .map((s) => s.trim());
-                          return {
-                            size: size || "",
-                            chest: chest || "",
-                            length: length || "",
-                          };
-                        });
-                        setFormData({
-                          ...formData,
-                          sizeChart: {
-                            ...formData.sizeChart,
-                            sizes,
-                          },
-                        });
-                      }}
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
-                      placeholder="S,38,26&#10;M,40,27&#10;L,42,28&#10;XL,44,29"
-                    />
-                    <p className="text-sm text-gray-500 mt-1">
-                      Enter size chart data in CSV format: Size,Chest,Length
-                      (one per line).
-                    </p>
-                  </div>
+                  <SizeChartEditor
+                    value={formData.sizeChart}
+                    onChange={(sizeChartData) =>
+                      setFormData({
+                        ...formData,
+                        sizeChart: sizeChartData,
+                      })
+                    }
+                  />
                 </div>
               </div>
 

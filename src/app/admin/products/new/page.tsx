@@ -8,10 +8,12 @@ import {
   addProduct,
   uploadImage,
   getCategories,
+  getSubcategories,
 } from "@/lib/firebase-services";
 import { Category } from "@/types";
 import { Upload, ArrowLeft, Plus, X } from "lucide-react";
 import Link from "next/link";
+import SizeChartEditor from "@/components/SizeChartEditor";
 
 // Type for product data without id, createdAt, and updatedAt
 type ProductInputData = {
@@ -20,7 +22,9 @@ type ProductInputData = {
   image: string;
   images: string[];
   categoryId: string;
+  subcategoryId?: string;
   categoryName: string;
+  subcategoryName?: string;
   description: string;
   rating: number;
   reviews: number;
@@ -47,8 +51,9 @@ type ProductInputData = {
     specifications: string[];
   };
   sizeChart?: {
-    sizes: { size: string; chest: string; length: string }[];
+    sizes: { [key: string]: string }[];
     instructions: string;
+    columns?: string[];
   };
   faq?: { question: string; answer: string }[];
 };
@@ -59,6 +64,7 @@ export default function NewProductPage() {
     price: "",
     description: "",
     categoryId: "",
+    subcategoryId: "",
     sizes: [] as string[],
     colors: [] as { name: string; hex: string }[],
     inStock: true,
@@ -84,8 +90,9 @@ export default function NewProductPage() {
       specifications: [] as string[],
     },
     sizeChart: {
-      sizes: [] as { size: string; chest: string; length: string }[],
+      sizes: [] as { [key: string]: string }[],
       instructions: "",
+      columns: ["Size", "Chest", "Length"],
     },
     faq: [] as { question: string; answer: string }[],
     // Quantity tiers
@@ -96,6 +103,7 @@ export default function NewProductPage() {
     }[],
   });
   const [categories, setCategories] = useState<Category[]>([]);
+  const [subcategories, setSubcategories] = useState<Category[]>([]);
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -119,6 +127,21 @@ export default function NewProductPage() {
       setCategories(data);
     } catch (error) {
       console.error("Error fetching categories:", error);
+    }
+  };
+
+  const handleCategoryChange = async (categoryId: string) => {
+    setFormData((prev) => ({ ...prev, categoryId, subcategoryId: "" }));
+    if (categoryId) {
+      try {
+        const subcats = await getSubcategories(categoryId);
+        setSubcategories(subcats);
+      } catch (error) {
+        console.error("Error fetching subcategories:", error);
+        setSubcategories([]);
+      }
+    } else {
+      setSubcategories([]);
     }
   };
 
@@ -229,6 +252,9 @@ export default function NewProductPage() {
       const selectedCategory = categories.find(
         (cat) => cat.id === formData.categoryId
       );
+      const selectedSubcategory = subcategories.find(
+        (subcat) => subcat.id === formData.subcategoryId
+      );
 
       // Prepare product data, filtering out undefined values
       const productData: ProductInputData = {
@@ -237,7 +263,9 @@ export default function NewProductPage() {
         image: imageUrls[0] || "",
         images: imageUrls,
         categoryId: formData.categoryId,
+        subcategoryId: formData.subcategoryId || undefined,
         categoryName: selectedCategory?.name || "",
+        subcategoryName: selectedSubcategory?.name || undefined,
         description: formData.description,
         rating: parseFloat(formData.rating),
         reviews: parseInt(formData.reviews),
@@ -267,6 +295,40 @@ export default function NewProductPage() {
 
       if (formData.quantityTiers.length > 0) {
         productData.quantityTiers = formData.quantityTiers;
+      }
+
+      // Add overview data if any fields have content
+      if (
+        formData.overview.materialOptions.length > 0 ||
+        formData.overview.designGuidelines.length > 0 ||
+        formData.overview.qualityFeatures.length > 0
+      ) {
+        productData.overview = formData.overview;
+      }
+
+      // Add specs data if any fields have content
+      if (
+        formData.specs.templates.length > 0 ||
+        formData.specs.specifications.length > 0
+      ) {
+        productData.specs = formData.specs;
+      }
+
+      // Add size chart data if it has content
+      if (
+        formData.sizeChart.sizes.length > 0 ||
+        formData.sizeChart.instructions.trim() !== ""
+      ) {
+        productData.sizeChart = {
+          sizes: formData.sizeChart.sizes,
+          instructions: formData.sizeChart.instructions,
+          columns: formData.sizeChart.columns,
+        };
+      }
+
+      // Add FAQ data if it has content
+      if (formData.faq.length > 0) {
+        productData.faq = formData.faq;
       }
 
       await addProduct(productData);
@@ -405,9 +467,7 @@ export default function NewProductPage() {
                 id="categoryId"
                 required
                 value={formData.categoryId}
-                onChange={(e) =>
-                  setFormData({ ...formData, categoryId: e.target.value })
-                }
+                onChange={(e) => handleCategoryChange(e.target.value)}
                 className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
               >
                 <option value="">Select a category</option>
@@ -418,6 +478,33 @@ export default function NewProductPage() {
                 ))}
               </select>
             </div>
+
+            {/* Subcategory Selection */}
+            {subcategories.length > 0 && (
+              <div>
+                <label
+                  htmlFor="subcategoryId"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Subcategory
+                </label>
+                <select
+                  id="subcategoryId"
+                  value={formData.subcategoryId}
+                  onChange={(e) =>
+                    setFormData({ ...formData, subcategoryId: e.target.value })
+                  }
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                >
+                  <option value="">Select a subcategory (optional)</option>
+                  {subcategories.map((subcategory) => (
+                    <option key={subcategory.id} value={subcategory.id}>
+                      {subcategory.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div>
               <label
@@ -872,67 +959,15 @@ export default function NewProductPage() {
                   <h4 className="text-md font-medium text-gray-900 mb-4">
                     Size Chart
                   </h4>
-
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Size Chart Instructions
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.sizeChart.instructions}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          sizeChart: {
-                            ...formData.sizeChart,
-                            instructions: e.target.value,
-                          },
-                        })
-                      }
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
-                      placeholder="For best fit, measure your favorite t-shirt and compare with the chart above"
-                    />
-                  </div>
-
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Size Chart Data (CSV format: Size,Chest,Length)
-                    </label>
-                    <textarea
-                      rows={6}
-                      value={formData.sizeChart.sizes
-                        .map((s) => `${s.size},${s.chest},${s.length}`)
-                        .join("\n")}
-                      onChange={(e) => {
-                        const lines = e.target.value
-                          .split("\n")
-                          .filter((line) => line.trim());
-                        const sizes = lines.map((line) => {
-                          const [size, chest, length] = line
-                            .split(",")
-                            .map((s) => s.trim());
-                          return {
-                            size: size || "",
-                            chest: chest || "",
-                            length: length || "",
-                          };
-                        });
-                        setFormData({
-                          ...formData,
-                          sizeChart: {
-                            ...formData.sizeChart,
-                            sizes,
-                          },
-                        });
-                      }}
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
-                      placeholder="S,38,26&#10;M,40,27&#10;L,42,28&#10;XL,44,29"
-                    />
-                    <p className="text-sm text-gray-500 mt-1">
-                      Enter size chart data in CSV format: Size,Chest,Length
-                      (one per line)
-                    </p>
-                  </div>
+                  <SizeChartEditor
+                    value={formData.sizeChart}
+                    onChange={(sizeChartData) =>
+                      setFormData({
+                        ...formData,
+                        sizeChart: sizeChartData,
+                      })
+                    }
+                  />
                 </div>
               </div>
 
