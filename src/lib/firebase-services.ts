@@ -82,8 +82,14 @@ export const addCategory = async (
 ) => {
   try {
     checkAdminAuth();
+
+    // Filter out undefined values to prevent Firebase errors
+    const filteredData = Object.fromEntries(
+      Object.entries(categoryData).filter(([, value]) => value !== undefined)
+    );
+
     const docRef = await addDoc(collection(db, "categories"), {
-      ...categoryData,
+      ...filteredData,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
@@ -99,9 +105,15 @@ export const updateCategory = async (
 ) => {
   try {
     checkAdminAuth();
+
+    // Filter out undefined values to prevent Firebase errors
+    const filteredData = Object.fromEntries(
+      Object.entries(categoryData).filter(([, value]) => value !== undefined)
+    );
+
     const docRef = doc(db, "categories", id);
     await updateDoc(docRef, {
-      ...categoryData,
+      ...filteredData,
       updatedAt: serverTimestamp(),
     });
   } catch (error) {
@@ -287,8 +299,14 @@ export const addProduct = async (
 ) => {
   try {
     checkAdminAuth();
+
+    // Filter out undefined values to prevent Firebase errors
+    const filteredData = Object.fromEntries(
+      Object.entries(productData).filter(([, value]) => value !== undefined)
+    );
+
     const docRef = await addDoc(collection(db, "products"), {
-      ...productData,
+      ...filteredData,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
@@ -304,9 +322,15 @@ export const updateProduct = async (
 ) => {
   try {
     checkAdminAuth();
+
+    // Filter out undefined values to prevent Firebase errors
+    const filteredData = Object.fromEntries(
+      Object.entries(productData).filter(([, value]) => value !== undefined)
+    );
+
     const docRef = doc(db, "products", id);
     await updateDoc(docRef, {
-      ...productData,
+      ...filteredData,
       updatedAt: serverTimestamp(),
     });
   } catch (error) {
