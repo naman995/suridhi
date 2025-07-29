@@ -23,17 +23,15 @@ export default function Home() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [productsData, categoriesData, popularData, trendingData] =
-          await Promise.all([
-            fetchProducts(),
-            fetchCategories(),
-            getPopularProducts(8),
-            getTrendingProducts(8),
-          ]);
+        const [productsData, categoriesData] = await Promise.all([
+          fetchProducts(),
+          fetchCategories(),
+        ]);
+
         setProducts(productsData);
         setCategories(categoriesData);
-        setPopularProducts(popularData);
-        setTrendingProducts(trendingData);
+        setPopularProducts([]);
+        setTrendingProducts([]);
       } catch (error) {
         console.error("Error loading data:", error);
       } finally {
@@ -61,44 +59,12 @@ export default function Home() {
       <div className="w-full">
         <HeroSection />
         <div className="mx-10 py-10">
-          <CategoryBrowser categories={categories} />
+          <CategoryBrowser
+            categories={categories}
+            popularProducts={popularProducts}
+            trendingProducts={trendingProducts}
+          />
         </div>
-
-        {/* Popular Products Section */}
-        {popularProducts.length > 0 && (
-          <div className="mx-10 py-10">
-            <div className="mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                Our Most Popular Products
-              </h2>
-              <p className="text-gray-600">
-                Discover what our customers love the most
-              </p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {popularProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Trending Products Section */}
-        {trendingProducts.length > 0 && (
-          <div className="mx-10 py-10 bg-white">
-            <div className="mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                Trending Products
-              </h2>
-              <p className="text-gray-600">Stay ahead with the latest trends</p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {trendingProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </main>
   );

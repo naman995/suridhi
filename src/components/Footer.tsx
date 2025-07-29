@@ -61,14 +61,6 @@ const Footer = () => {
                   Returns & Refunds
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/admin/login"
-                  className="text-sm hover:text-white transition-colors text-blue-400"
-                >
-                  Admin Login
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -150,12 +142,6 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4">
               <p className="text-sm">© 2024 Suridhi. All rights reserved.</p>
-              <Link 
-                href="/admin/login" 
-                className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
-              >
-                Admin Login
-              </Link>
             </div>
             <div className="flex space-x-6">
               <a

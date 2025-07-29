@@ -2,10 +2,12 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRef } from "react";
-import { Category } from "@/types";
+import { Category, Product } from "@/types";
 
 interface CategoryBrowserProps {
   categories?: Category[];
+  popularProducts?: Product[];
+  trendingProducts?: Product[];
 }
 
 const defaultCategories = [
@@ -55,66 +57,16 @@ const defaultCategories = [
   { name: "Custom Bags", id: "custom-bags", image: "/custom-bag.webp" },
 ];
 
-const popularProducts = [
-  {
-    name: "Men's Polo T-Shirts",
-    price: "BUY 1 @ Rs.550",
-    image: "/custom_polo_tshirts.webp",
-  },
-  {
-    name: "Standard Visiting Cards",
-    price: "BUY 100 @ Rs.200",
-    image: "/visitingCard.webp",
-  },
-  {
-    name: "Single Fold Umbrellas",
-    price: "BUY 1 @ Rs.850",
-    image: "/umbrella_and_rainwear.webp",
-  }, // Using available umbrella image
-  {
-    name: "Men's T-Shirts",
-    price: "BUY 1 @ Rs.420",
-    image: "/custom_tshirt.webp",
-  },
-  { name: "Letterheads", price: "BUY 10 @ Rs.230", image: "" }, // No direct image found
-  {
-    name: "Self Inking Stamps",
-    price: "BUY 1 @ Rs.290",
-    image: "/custom_stamps.webp",
-  },
-];
+// These arrays are no longer needed - products will come from Firebase
+// const popularProducts = [];
+// const trendingProducts = [];
 
-const trendingProducts = [
-  {
-    name: "Share Design On WhatsApp",
-    price: "Starting from Rs 400",
-    image: "",
-  }, // No direct image found
-  { name: "Employee Gift Hampers", price: "", image: "/custom-gifts.webp" },
-  {
-    name: "Two-Fold Umbrellas",
-    price: "BUY 1 @ Rs.700",
-    image: "/umbrella_and_rainwear.webp",
-  }, // Using available umbrella image
-  {
-    name: "Raincoats",
-    price: "BUY 1 @ Rs.750",
-    image: "/umbrella_and_rainwear.webp",
-  }, // Using available umbrella image
-  {
-    name: "Rounded Corner Visiting Cards",
-    price: "BUY 100 @ Rs.250",
-    image: "/visitingCard.webp",
-  }, // Using available visiting card image
-  {
-    name: "Premium Polo T-Shirts",
-    price: "BUY 1 @ Rs.750",
-    image: "/custom_polo_tshirts.webp",
-  }, // Using available polo t-shirt image
-];
-
-const CategoryBrowser = ({ categories }: CategoryBrowserProps) => {
-  // Use Firebase categories if available, otherwise fall back to default categories
+const CategoryBrowser = ({
+  categories,
+  popularProducts,
+  trendingProducts,
+}: CategoryBrowserProps) => {
+  // Only show categories from admin panel, no fallback to default categories
   const displayCategories =
     categories && categories.length > 0
       ? categories.map((cat) => ({
@@ -123,7 +75,7 @@ const CategoryBrowser = ({ categories }: CategoryBrowserProps) => {
           image: cat.image || "/custom_tshirt.webp", // fallback image
           href: `/category/${cat.id}`,
         }))
-      : defaultCategories;
+      : [];
 
   // Create refs for the carousel divs
   const popularProductsRef = useRef<HTMLDivElement>(null);
@@ -145,32 +97,41 @@ const CategoryBrowser = ({ categories }: CategoryBrowserProps) => {
       <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
         Explore all categories
       </h2>
-      <div className="flex space-x-8 overflow-x-auto py-4 scrollbar-hide px-4">
-        {displayCategories.map((category) => (
-          <Link
-            key={category.id}
-            href={category.href || `/category/${category.id}`}
-            className="flex-shrink-0 flex flex-col items-center w-32"
-          >
-            <div className="w-28 h-28 rounded-full bg-gray-300 overflow-hidden flex items-center justify-center shadow-xl">
-              {/* Replace with actual category images */}
-              {category.image && (
-                <Image
-                  src={category.image}
-                  alt={category.name}
-                  width={112}
-                  height={112}
-                  objectFit="cover"
-                  className="rounded-full"
-                />
-              )}
-            </div>
-            <p className="mt-3 text-sm font-medium text-gray-700 text-center leading-tight">
-              {category.name}
-            </p>
-          </Link>
-        ))}
-      </div>
+      {displayCategories.length > 0 ? (
+        <div className="flex space-x-8 overflow-x-auto py-4 scrollbar-hide px-4">
+          {displayCategories.map((category) => (
+            <Link
+              key={category.id}
+              href={category.href || `/category/${category.id}`}
+              className="flex-shrink-0 flex flex-col items-center w-32"
+            >
+              <div className="w-28 h-28 rounded-full bg-gray-300 overflow-hidden flex items-center justify-center shadow-xl">
+                {/* Replace with actual category images */}
+                {category.image && (
+                  <Image
+                    src={category.image}
+                    alt={category.name}
+                    width={112}
+                    height={112}
+                    objectFit="cover"
+                    className="rounded-full"
+                  />
+                )}
+              </div>
+              <p className="mt-3 text-sm font-medium text-gray-700 text-center leading-tight">
+                {category.name}
+              </p>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-8">
+          <p className="text-gray-500 text-lg">No categories available yet.</p>
+          <p className="text-gray-400 text-sm mt-2">
+            Categories will appear here once you add them from the admin panel.
+          </p>
+        </div>
+      )}
       {/* Navigation arrows (Optional, can be implemented later) - Keeping commented out as per image structure */}
       {/*
             <button className="absolute top-1/2 left-0 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md cursor-pointer z-10 hidden md:block">
@@ -187,173 +148,185 @@ const CategoryBrowser = ({ categories }: CategoryBrowserProps) => {
             </button>
             */}
 
-      {/* Our Most Popular Products Section */}
-      <div className="mt-12 relative">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-          Our Most Popular Products
-        </h2>
-        <div
-          id="popular-products-carousel"
-          className="relative flex space-x-6 overflow-x-auto py-4 scrollbar-hide px-4 snap-x snap-mandatory group"
-          ref={popularProductsRef}
-        >
-          {popularProducts.map((product, index) => (
-            <div
-              key={index}
-              className="flex-shrink-0 w-72 bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 snap-start"
+      {/* Popular Products Section - Now controlled by admin panel */}
+      {popularProducts && popularProducts.length > 0 && (
+        <div className="mt-12 relative">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+            Our Most Popular Products
+          </h2>
+          <div
+            id="popular-products-carousel"
+            className="relative flex space-x-6 overflow-x-auto py-4 scrollbar-hide px-4 snap-x snap-mandatory group"
+            ref={popularProductsRef}
+          >
+            {popularProducts.map((product) => (
+              <Link
+                key={product.id}
+                href={`/product/${product.id}`}
+                className="flex-shrink-0 w-72 bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 snap-start hover:shadow-lg transition-shadow"
+              >
+                <div className="relative w-full h-72 flex items-center justify-center bg-gray-100 rounded-t-lg">
+                  {product.image ? (
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      width={288}
+                      height={192}
+                      className="object-cover w-full h-full"
+                    />
+                  ) : (
+                    <span className="text-gray-500 text-center px-4">
+                      Image Unavailable
+                    </span>
+                  )}
+                  {product.isSale && product.discount && (
+                    <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                      -{product.discount}%
+                    </span>
+                  )}
+                </div>
+                <div className="p-3">
+                  <p className="text-sm font-medium text-gray-800 text-center leading-tight">
+                    {product.name}
+                  </p>
+                  <p className="text-sm text-gray-600 text-center mt-1">
+                    ₹{product.price.toFixed(2)}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+          {/* Navigation arrows for Popular Products */}
+          <button
+            className="absolute top-1/2 -translate-y-1/2 left-6 bg-white rounded-full p-2 shadow-md cursor-pointer z-10 md:block"
+            onClick={() => scrollCarousel(popularProductsRef, "left")}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 text-gray-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-              <div className="relative w-full h-72 flex items-center justify-center bg-gray-100 rounded-t-lg">
-                {product.image ? (
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    width={288}
-                    height={192}
-                    objectFit="cover"
-                  />
-                ) : (
-                  <span className="text-gray-500 text-center px-4">
-                    Image Unavailable
-                  </span>
-                )}
-                {product.price && (
-                  <span className="absolute top-2 left-2 bg-blue-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
-                    {product.price}
-                  </span>
-                )}
-              </div>
-              <div className="p-3">
-                <p className="text-sm font-medium text-gray-800 text-center leading-tight">
-                  {product.name}
-                </p>
-              </div>
-            </div>
-          ))}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+          <button
+            className="absolute top-1/2 -translate-y-1/2 right-6 bg-white rounded-full p-2 shadow-md cursor-pointer z-10 md:block"
+            onClick={() => scrollCarousel(popularProductsRef, "right")}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 text-gray-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
         </div>
-        {/* Navigation arrows for Popular Products - Moved outside carousel div and adjusted positioning */}
-        <button
-          className="absolute top-1/2 -translate-y-1/2 left-6 bg-white rounded-full p-2 shadow-md cursor-pointer z-10 md:block"
-          onClick={() => scrollCarousel(popularProductsRef, "left")}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 text-gray-600"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </button>
-        <button
-          className="absolute top-1/2 -translate-y-1/2 right-6 bg-white rounded-full p-2 shadow-md cursor-pointer z-10 md:block"
-          onClick={() => scrollCarousel(popularProductsRef, "right")}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 text-gray-600"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </button>
-      </div>
+      )}
 
-      {/* Trending Products Section */}
-      <div className="mt-12 relative">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-          Trending Products
-        </h2>
-        <div
-          id="trending-products-carousel"
-          className="relative flex space-x-6 overflow-x-auto py-4 scrollbar-hide px-4 snap-x snap-mandatory group"
-          ref={trendingProductsRef}
-        >
-          {trendingProducts.map((product, index) => (
-            <div
-              key={index}
-              className="flex-shrink-0 w-72 bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 snap-start"
+      {/* Trending Products Section - Now controlled by admin panel */}
+      {trendingProducts && trendingProducts.length > 0 && (
+        <div className="mt-12 relative">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+            Trending Products
+          </h2>
+          <div
+            id="trending-products-carousel"
+            className="relative flex space-x-6 overflow-x-auto py-4 scrollbar-hide px-4 snap-x snap-mandatory group"
+            ref={trendingProductsRef}
+          >
+            {trendingProducts.map((product) => (
+              <Link
+                key={product.id}
+                href={`/product/${product.id}`}
+                className="flex-shrink-0 w-72 bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 snap-start hover:shadow-lg transition-shadow"
+              >
+                <div className="relative w-full h-72 flex items-center justify-center bg-gray-100 rounded-t-lg">
+                  {product.image ? (
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      width={288}
+                      height={256}
+                      className="object-cover w-full h-full"
+                    />
+                  ) : (
+                    <span className="text-gray-500 text-center px-4">
+                      Image Unavailable
+                    </span>
+                  )}
+                  {product.isSale && product.discount && (
+                    <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                      -{product.discount}%
+                    </span>
+                  )}
+                </div>
+                <div className="p-3">
+                  <p className="text-sm font-medium text-gray-800 text-center leading-tight">
+                    {product.name}
+                  </p>
+                  <p className="text-sm text-gray-600 text-center mt-1">
+                    ₹{product.price.toFixed(2)}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+          {/* Navigation arrows for Trending Products */}
+          <button
+            className="absolute top-1/2 -translate-y-1/2 left-6 bg-white rounded-full p-2 shadow-md cursor-pointer z-10 md:block"
+            onClick={() => scrollCarousel(trendingProductsRef, "left")}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 text-gray-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-              <div className="relative w-full h-72 flex items-center justify-center bg-gray-100 rounded-t-lg">
-                {product.image ? (
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    width={288}
-                    height={256}
-                    objectFit="cover"
-                  />
-                ) : (
-                  <span className="text-gray-500 text-center px-4">
-                    Image Unavailable
-                  </span>
-                )}
-                {product.price && (
-                  <span className="absolute top-2 left-2 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
-                    {product.price}
-                  </span>
-                )}
-              </div>
-              <div className="p-3">
-                <p className="text-sm font-medium text-gray-800 text-center leading-tight">
-                  {product.name}
-                </p>
-              </div>
-            </div>
-          ))}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+          <button
+            className="absolute top-1/2 -translate-y-1/2 right-6 bg-white rounded-full p-2 shadow-md cursor-pointer z-10 md:block"
+            onClick={() => scrollCarousel(trendingProductsRef, "right")}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 text-gray-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
         </div>
-        {/* Navigation arrows for Trending Products - Moved outside carousel div and adjusted positioning */}
-        <button
-          className="absolute top-1/2 -translate-y-1/2 left-6 bg-white rounded-full p-2 shadow-md cursor-pointer z-10 md:block"
-          onClick={() => scrollCarousel(trendingProductsRef, "left")}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 text-gray-600"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </button>
-        <button
-          className="absolute top-1/2 -translate-y-1/2 right-6 bg-white rounded-full p-2 shadow-md cursor-pointer z-10 md:block"
-          onClick={() => scrollCarousel(trendingProductsRef, "right")}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 text-gray-600"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </button>
-      </div>
+      )}
     </div>
   );
 };

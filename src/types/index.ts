@@ -25,6 +25,12 @@ export interface Product {
   isNew?: boolean;
   isSale?: boolean;
   discount?: number;
+  // Quantity and pricing tiers
+  quantityTiers?: {
+    minQuantity: number;
+    maxQuantity: number;
+    pricePerUnit: number;
+  }[];
   // Home page display options
   isPopular?: boolean;
   isTrending?: boolean;

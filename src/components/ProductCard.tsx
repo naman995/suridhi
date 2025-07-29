@@ -1,16 +1,17 @@
-'use client';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Product } from '@/data/products';
+"use client";
+import Image from "next/image";
+import Link from "next/link";
+import { Product } from "@/data/products";
 
 interface ProductCardProps {
   product: Product;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const discountedPrice = product.isSale && product.discount
-    ? product.price - (product.price * product.discount / 100)
-    : null;
+  const discountedPrice =
+    product.isSale && product.discount
+      ? product.price - (product.price * product.discount) / 100
+      : null;
 
   return (
     <div className="group relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
@@ -43,8 +44,8 @@ export default function ProductCard({ product }: ProductCardProps) {
                   key={i}
                   className={`h-4 w-4 ${
                     i < Math.floor(product.rating)
-                      ? 'text-yellow-400'
-                      : 'text-gray-300'
+                      ? "text-yellow-400"
+                      : "text-gray-300"
                   }`}
                   fill="currentColor"
                   viewBox="0 0 20 20"
@@ -53,27 +54,31 @@ export default function ProductCard({ product }: ProductCardProps) {
                 </svg>
               ))}
             </div>
-            <span className="ml-2 text-sm text-gray-500">({product.reviews})</span>
+            <span className="ml-2 text-sm text-gray-500">
+              ({product.reviews})
+            </span>
           </div>
           <div className="mt-2 flex items-center justify-between">
             <div>
               {discountedPrice ? (
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-bold text-gray-900">
-                    ${discountedPrice.toFixed(2)}
+                    ₹{discountedPrice.toFixed(2)}
                   </span>
                   <span className="text-sm text-gray-500 line-through">
-                    ${product.price.toFixed(2)}
+                    ₹{product.price.toFixed(2)}
                   </span>
                 </div>
               ) : (
                 <span className="text-lg font-bold text-gray-900">
-                  ${product.price.toFixed(2)}
+                  ₹{product.price.toFixed(2)}
                 </span>
               )}
             </div>
             {!product.inStock && (
-              <span className="text-sm text-red-500 font-medium">Out of Stock</span>
+              <span className="text-sm text-red-500 font-medium">
+                Out of Stock
+              </span>
             )}
           </div>
           <p className="mt-2 text-sm text-gray-500 line-clamp-2">
@@ -83,4 +88,4 @@ export default function ProductCard({ product }: ProductCardProps) {
       </Link>
     </div>
   );
-} 
+}

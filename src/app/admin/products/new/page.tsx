@@ -32,6 +32,11 @@ type ProductInputData = {
   sizes?: string[];
   colors?: { name: string; hex: string }[];
   discount?: number;
+  quantityTiers?: {
+    minQuantity: number;
+    maxQuantity: number;
+    pricePerUnit: number;
+  }[];
   overview?: {
     materialOptions: string[];
     designGuidelines: string[];
@@ -83,6 +88,12 @@ export default function NewProductPage() {
       instructions: "",
     },
     faq: [] as { question: string; answer: string }[],
+    // Quantity tiers
+    quantityTiers: [] as {
+      minQuantity: number;
+      maxQuantity: number;
+      pricePerUnit: number;
+    }[],
   });
   const [categories, setCategories] = useState<Category[]>([]);
   const [images, setImages] = useState<File[]>([]);
@@ -91,6 +102,11 @@ export default function NewProductPage() {
   const [error, setError] = useState("");
   const [newSize, setNewSize] = useState("");
   const [newColor, setNewColor] = useState({ name: "", hex: "#000000" });
+  const [newQuantityTier, setNewQuantityTier] = useState({
+    minQuantity: "",
+    maxQuantity: "",
+    pricePerUnit: "",
+  });
   const router = useRouter();
 
   useEffect(() => {
@@ -164,6 +180,38 @@ export default function NewProductPage() {
     }));
   };
 
+  const addQuantityTier = () => {
+    if (
+      newQuantityTier.minQuantity &&
+      newQuantityTier.maxQuantity &&
+      newQuantityTier.pricePerUnit
+    ) {
+      setFormData((prev) => ({
+        ...prev,
+        quantityTiers: [
+          ...prev.quantityTiers,
+          {
+            minQuantity: parseInt(newQuantityTier.minQuantity),
+            maxQuantity: parseInt(newQuantityTier.maxQuantity),
+            pricePerUnit: parseFloat(newQuantityTier.pricePerUnit),
+          },
+        ],
+      }));
+      setNewQuantityTier({
+        minQuantity: "",
+        maxQuantity: "",
+        pricePerUnit: "",
+      });
+    }
+  };
+
+  const removeQuantityTier = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      quantityTiers: prev.quantityTiers.filter((_, i) => i !== index),
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -215,6 +263,10 @@ export default function NewProductPage() {
         formData.discount.trim() !== ""
       ) {
         productData.discount = parseFloat(formData.discount);
+      }
+
+      if (formData.quantityTiers.length > 0) {
+        productData.quantityTiers = formData.quantityTiers;
       }
 
       await addProduct(productData);
@@ -523,6 +575,85 @@ export default function NewProductPage() {
                   <Plus className="h-4 w-4" />
                 </button>
               </div>
+            </div>
+
+            {/* Quantity Tiers */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Quantity Pricing Tiers (Bulk Discounts)
+              </label>
+              <div className="space-y-2 mb-4">
+                {formData.quantityTiers.map((tier, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                  >
+                    <span className="text-sm text-gray-700">
+                      {tier.minQuantity} - {tier.maxQuantity} units: ₹
+                      {tier.pricePerUnit.toFixed(2)} per unit
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeQuantityTier(index)}
+                      className="text-red-600 hover:text-red-800"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <input
+                  type="number"
+                  value={newQuantityTier.minQuantity}
+                  onChange={(e) =>
+                    setNewQuantityTier({
+                      ...newQuantityTier,
+                      minQuantity: e.target.value,
+                    })
+                  }
+                  placeholder="Min Qty"
+                  className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                />
+                <input
+                  type="number"
+                  value={newQuantityTier.maxQuantity}
+                  onChange={(e) =>
+                    setNewQuantityTier({
+                      ...newQuantityTier,
+                      maxQuantity: e.target.value,
+                    })
+                  }
+                  placeholder="Max Qty"
+                  className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                />
+                <div className="flex space-x-2">
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={newQuantityTier.pricePerUnit}
+                    onChange={(e) =>
+                      setNewQuantityTier({
+                        ...newQuantityTier,
+                        pricePerUnit: e.target.value,
+                      })
+                    }
+                    placeholder="Price/Unit"
+                    className="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                  />
+                  <button
+                    type="button"
+                    onClick={addQuantityTier}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                Add quantity tiers for bulk pricing. Leave empty to use base
+                price for all quantities.
+              </p>
             </div>
 
             {/* Product Options */}
