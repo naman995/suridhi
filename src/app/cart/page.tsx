@@ -54,7 +54,7 @@ export default function CartPage() {
               Your cart is empty
             </h2>
             <p className="text-gray-600 mb-8">
-              Looks like you haven't added any items to your cart yet.
+              Looks like you haven&apos;t added any items to your cart yet.
             </p>
             <Link
               href="/"
@@ -198,7 +198,9 @@ export default function CartPage() {
                 <div className="border-t border-gray-200 pt-3">
                   <div className="flex justify-between text-lg font-semibold">
                     <span className="text-gray-900">Total</span>
-                    <span className="text-gray-900">₹{state.total.toFixed(2)}</span>
+                    <span className="text-gray-900">
+                      ₹{state.total.toFixed(2)}
+                    </span>
                   </div>
                 </div>
               </div>

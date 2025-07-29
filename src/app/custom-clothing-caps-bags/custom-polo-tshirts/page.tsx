@@ -2,17 +2,17 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useRef } from "react";
+
 
 const popularPoloProducts = [
   {
-    name: "Men's Polo T-Shirts",
+    name: "Men&apos;s Polo T-Shirts",
     price: "Starting at ₹ 550.00",
     image: "/custom_polo_tshirts.webp",
     colors: 4,
   },
   {
-    name: "Women's Polo T-Shirts",
+    name: "Women&apos;s Polo T-Shirts",
     price: "Starting at ₹ 550.00",
     image: "/custom_polo_tshirts.webp",
     colors: 4,
@@ -24,7 +24,7 @@ const popularPoloProducts = [
     colors: null,
   },
   {
-    name: "Men's Scott Polo T-Shirts",
+    name: "Men&apos;s Scott Polo T-Shirts",
     price: "1 Starting at ₹ 820.00",
     image: "/custom_polo_tshirts.webp",
     colors: null,
@@ -33,18 +33,6 @@ const popularPoloProducts = [
 ];
 
 const CustomPoloTshirtsPage = () => {
-  const lovedProductsRef = useRef<HTMLDivElement>(null);
-
-  const scrollCarousel = (
-    ref: React.RefObject<HTMLDivElement | null>,
-    direction: "left" | "right"
-  ) => {
-    if (ref.current) {
-      const scrollAmount = direction === "left" ? -300 : 300; // Adjust scroll amount as needed
-      ref.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
-    }
-  };
-
   return (
     <div className=" mx-auto px-4   py-8 bg-gray-50">
       {/* Breadcrumbs */}
@@ -71,12 +59,12 @@ const CustomPoloTshirtsPage = () => {
             <ul>
               <li className="mb-2">
                 <Link href="#" className="text-gray-600 hover:text-gray-900">
-                  Men's Polo T-Shirts
+                  Men&apos;s Polo T-Shirts
                 </Link>
               </li>
               <li className="mb-2">
                 <Link href="#" className="text-gray-600 hover:text-gray-900">
-                  Women's Polo T-Shirts
+                  Women&apos;s Polo T-Shirts
                 </Link>
               </li>
               <li className="mb-2">
@@ -86,12 +74,12 @@ const CustomPoloTshirtsPage = () => {
               </li>
               <li className="mb-2">
                 <Link href="#" className="text-gray-600 hover:text-gray-900">
-                  Men's Scott Polo T-Shirts
+                  Men&apos;s Scott Polo T-Shirts
                 </Link>
               </li>
               <li className="mb-2">
                 <Link href="#" className="text-gray-600 hover:text-gray-900">
-                  Women's Scott Polo T-Shirts
+                  Women&apos;s Scott Polo T-Shirts
                 </Link>
               </li>
               <li className="mb-2">
@@ -168,7 +156,7 @@ const CustomPoloTshirtsPage = () => {
               </li>
               <li className="mb-2">
                 <Link href="#" className="text-gray-600 hover:text-gray-900">
-                  Legends Men's Polo T Shirt
+                  Legends Men&apos;s Polo T Shirt
                 </Link>
               </li>
               <li className="mb-2">

@@ -47,8 +47,10 @@ export default function ViewCategoryPage() {
     try {
       await deleteCategory(categoryId);
       router.push("/admin/categories");
-    } catch (error: any) {
-      setError(error.message || "Failed to delete category");
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to delete category";
+      setError(errorMessage);
     } finally {
       setDeleting(false);
     }
@@ -73,7 +75,7 @@ export default function ViewCategoryPage() {
               Category Not Found
             </h2>
             <p className="text-gray-600 mb-4">
-              The category you're looking for doesn't exist.
+              The category you&apos;re looking for doesn&apos;t exist.
             </p>
             <Link
               href="/admin/categories"

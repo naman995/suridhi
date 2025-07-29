@@ -35,8 +35,10 @@ export default function CheckoutForm() {
 
       setSuccess(true);
       clearCart();
-    } catch (error: any) {
-      setError(error.message || "Failed to place order");
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to place order";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -65,7 +67,7 @@ export default function CheckoutForm() {
             Order Placed Successfully!
           </h2>
           <p className="text-gray-600 mb-6">
-            Thank you for your order. We'll contact you soon with order
+            Thank you for your order. We&apos;ll contact you soon with order
             confirmation and delivery details.
           </p>
           <button

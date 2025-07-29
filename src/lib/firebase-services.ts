@@ -11,7 +11,6 @@ import {
   orderBy,
   limit,
   serverTimestamp,
-  Timestamp,
 } from "firebase/firestore";
 import {
   signInWithEmailAndPassword,
@@ -21,10 +20,9 @@ import {
 } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, auth, storage } from "./firebase";
-import { Category, Product, Order, CartItem } from "@/types";
+import { Category, Product, Order } from "@/types";
 
 // Admin configuration - Change these to your specific admin credentials
-const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || "admin@suridhi.com";
 const ADMIN_UID = process.env.NEXT_PUBLIC_ADMIN_UID || "";
 
 // Check if current user is the authorized admin

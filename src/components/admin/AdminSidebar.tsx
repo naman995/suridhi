@@ -7,7 +7,6 @@ import {
   Package,
   Tag,
   ShoppingCart,
-  Users,
   Settings,
   BarChart3,
 } from "lucide-react";

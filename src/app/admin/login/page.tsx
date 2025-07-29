@@ -21,8 +21,10 @@ export default function AdminLogin() {
     try {
       await signInAdmin(email, password);
       router.push("/admin");
-    } catch (error: any) {
-      setError(error.message || "Failed to sign in");
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to sign in";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

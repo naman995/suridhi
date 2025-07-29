@@ -10,7 +10,6 @@ import {
   updateCategory,
   uploadImage,
 } from "@/lib/firebase-services";
-import { Category } from "@/types";
 
 export default function EditCategoryPage() {
   const router = useRouter();
@@ -43,7 +42,7 @@ export default function EditCategoryPage() {
 
       setFormData({
         name: categoryData.name,
-        description: categoryData.description,
+        description: categoryData.description || "",
         image: null,
         showInNavbar: categoryData.showInNavbar || false,
       });
@@ -90,8 +89,10 @@ export default function EditCategoryPage() {
       });
 
       router.push("/admin/categories");
-    } catch (error: any) {
-      setError(error.message || "Failed to update category");
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to update category";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -116,7 +117,7 @@ export default function EditCategoryPage() {
               Category Not Found
             </h2>
             <p className="text-gray-600 mb-4">
-              The category you're looking for doesn't exist.
+              The category you&apos;re looking for doesn&apos;t exist.
             </p>
             <Link
               href="/admin/categories"
@@ -220,7 +221,8 @@ export default function EditCategoryPage() {
               </label>
             </div>
             <p className="text-sm text-gray-500">
-              Check this box to display this category in the main navigation bar.
+              Check this box to display this category in the main navigation
+              bar.
             </p>
 
             <div>

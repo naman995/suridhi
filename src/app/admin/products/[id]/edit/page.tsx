@@ -13,7 +13,7 @@ import {
   getSubcategories,
   uploadImage,
 } from "@/lib/firebase-services";
-import { Product, Category } from "@/types";
+import { Category } from "@/types";
 
 export default function EditProductPage() {
   const router = useRouter();
@@ -289,7 +289,7 @@ export default function EditProductPage() {
       );
 
       // Prepare product data, filtering out undefined values
-      const productData: any = {
+      const productData: Partial<Product> = {
         name: formData.name,
         price: parseFloat(formData.price),
         image: allImages[0] || "",
@@ -332,8 +332,10 @@ export default function EditProductPage() {
 
       await updateProduct(productId, productData);
       router.push("/admin/products");
-    } catch (error: any) {
-      setError(error.message || "Failed to update product");
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to update product";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -358,7 +360,7 @@ export default function EditProductPage() {
               Product Not Found
             </h2>
             <p className="text-gray-600 mb-4">
-              The product you're looking for doesn't exist.
+              The product you&apos;re looking for doesn&apos;t exist.
             </p>
             <Link
               href="/admin/products"

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import DynamicNavbar from "@/components/DynamicNavbar";
 import ProductCard from "@/components/ProductCard";
 
@@ -77,9 +78,9 @@ export default function SubcategoryPage() {
         <nav className="flex mb-8" aria-label="Breadcrumb">
           <ol className="inline-flex items-center space-x-1 md:space-x-3">
             <li className="inline-flex items-center">
-              <a href="/" className="text-gray-700 hover:text-blue-600">
+              <Link href="/" className="text-gray-700 hover:text-blue-600">
                 Home
-              </a>
+              </Link>
             </li>
             <li>
               <div className="flex items-center">
@@ -94,12 +95,12 @@ export default function SubcategoryPage() {
                     clipRule="evenodd"
                   ></path>
                 </svg>
-                <a
+                <Link
                   href={`/category/${categoryId}`}
                   className="ml-1 text-gray-700 hover:text-blue-600 md:ml-2"
                 >
                   {category?.name}
-                </a>
+                </Link>
               </div>
             </li>
             <li aria-current="page">

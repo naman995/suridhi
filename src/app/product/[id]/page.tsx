@@ -9,7 +9,6 @@ import {
   Download,
   Plus,
   Minus,
-  Heart,
   Star,
   CheckCircle,
   Truck,
@@ -103,7 +102,7 @@ export default function ProductDetailPage() {
               Product Not Found
             </h2>
             <p className="text-gray-600 mb-4">
-              The product you're looking for doesn't exist.
+              The product you&apos;re looking for doesn&apos;t exist.
             </p>
             <Link
               href="/"

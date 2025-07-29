@@ -381,7 +381,7 @@ export default function CheckoutPage() {
                 </h3>
                 <ul className="text-sm text-blue-800 space-y-1">
                   <li>
-                    • We'll contact you within 24 hours with final pricing
+                    • We&apos;ll contact you within 24 hours with final pricing
                   </li>
                   <li>• Bulk discounts will be applied based on quantity</li>
                   <li>• Custom requirements will be discussed</li>

@@ -10,53 +10,6 @@ interface CategoryBrowserProps {
   trendingProducts?: Product[];
 }
 
-const defaultCategories = [
-  { name: "Visiting Cards", id: "visiting-cards", image: "/visitingCard.webp" },
-  {
-    name: "Custom Polo T-shirts",
-    id: "custom-polo-tshirts",
-    image: "/custom_polo_tshirts.webp",
-    href: "/custom-clothing-caps-bags/custom-polo-tshirts",
-  },
-  {
-    name: "Umbrellas & Rainwear",
-    id: "umbrellas-rainwear",
-    image: "/umbrella_and_rainwear.webp",
-  },
-  {
-    name: "Custom T-shirts",
-    id: "custom-t-shirts",
-    image: "/custom_tshirt.webp",
-  },
-  {
-    name: "Custom Stamps & Ink",
-    id: "custom-stamps-ink",
-    image: "/custom_stamps.webp",
-  },
-  { name: "Photo Gifts", id: "photo-gifts", image: "/photo-gifts.webp" },
-  {
-    name: "Labels, Stickers & Packaging",
-    id: "labels-stickers-packaging",
-    image: "/label-sticker-packing.webp",
-  },
-  {
-    name: "Custom Stationery",
-    id: "custom-stationery",
-    image: "/custom_statonary.webp",
-  },
-  {
-    name: "Signs, Posters & Marketing Materials",
-    id: "signs-posters-marketing-materials",
-    image: "/sign-poster.webp",
-  },
-  {
-    name: "Custom Drinkware",
-    id: "custom-drinkware",
-    image: "/custom-drinkware.webp",
-  },
-  { name: "Custom Bags", id: "custom-bags", image: "/custom-bag.webp" },
-];
-
 // These arrays are no longer needed - products will come from Firebase
 // const popularProducts = [];
 // const trendingProducts = [];

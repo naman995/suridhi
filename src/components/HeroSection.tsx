@@ -1,5 +1,4 @@
-'use client';
-import Link from 'next/link';
+"use client";
 
 const HeroSection = () => {
   return (
@@ -18,4 +17,4 @@ const HeroSection = () => {
   );
 };
 
-export default HeroSection; 
+export default HeroSection;

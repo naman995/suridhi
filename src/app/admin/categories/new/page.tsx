@@ -77,13 +77,15 @@ export default function NewCategoryPage() {
         description: formData.description,
         image: imageUrl,
         showInNavbar: formData.showInNavbar,
-        parentId: formData.parentId || null,
+        parentId: formData.parentId || undefined,
         count: formData.count,
       });
 
       router.push("/admin/categories");
-    } catch (error: any) {
-      setError(error.message || "Failed to create category");
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to create category";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -177,7 +179,8 @@ export default function NewCategoryPage() {
                 ))}
               </select>
               <p className="text-sm text-gray-500 mt-1">
-                Leave empty to create a main category, or select a parent to create a subcategory.
+                Leave empty to create a main category, or select a parent to
+                create a subcategory.
               </p>
             </div>
 
